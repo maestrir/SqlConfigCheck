@@ -1,0 +1,57 @@
+=== SCHEMA: OTTIMIZZAZIONE PERFORMANCE SQL SERVER EXPRESS EDITION ===
+
+1) LIMITAZIONI SQL SERVER EXPRESS EDITION:
+--------------------------------------------------
+- RAM massima utilizzabile: ~1,4 GB
+- CPU massima utilizzabile: 1 CPU fisica (fino a 4 core)
+- Dimensione massima per Database: 10 GB
+- SQL Server Agent: NON disponibile (nessuna automazione integrata)
+
+CONSEGUENZE:
+- Aumentare RAM oltre i 4 GB ha benefici limitati.
+- Limitazioni hardware restringono fortemente prestazioni generali.
+
+---
+
+2) AZIONI RACCOMANDATE PER MIGLIORARE PRESTAZIONI (nonostante limitazioni):
+
+1) OTTIMIZZAZIONE DISCHI:
+- Usare dischi veloci SSD o NVMe per database e TempDB.
+- Beneficio: Netta riduzione tempi lettura/scrittura dati.
+
+2) OTTIMIZZAZIONE INDICI E STATISTICHE:
+- Ricostruire frequentemente gli indici:
+  ALTER INDEX ALL ON [NomeTabella] REBUILD;
+- Aggiornare statistiche:
+  EXEC sp_updatestats;
+
+3) CONFIGURAZIONE MEMORIA SQL SERVER:
+- Impostare limite massimo memoria a 1400 MB circa:
+  EXEC sp_configure 'max server memory (MB)', 1400;  
+  RECONFIGURE;
+
+4) OTTIMIZZAZIONE TEMPDB:
+- Creare più file TempDB (massimo 4):
+  ALTER DATABASE tempdb ADD FILE
+  (NAME='tempdev2', FILENAME='C:\SQLData\tempdb2.ndf', SIZE=512MB, FILEGROWTH=256MB);
+- Tutti i file TempDB devono avere dimensioni identiche.
+
+5) OTTIMIZZAZIONE PARALLELISMO:
+- Impostare MAXDOP (max degree of parallelism) a 4:
+  EXEC sp_configure 'max degree of parallelism', 4;  
+  RECONFIGURE;
+
+- Impostare Cost Threshold for Parallelism a 50:
+  EXEC sp_configure 'cost threshold for parallelism', 50;
+  RECONFIGURE;
+
+6) OTTIMIZZAZIONE QUERY/APPLICAZIONE:
+- Usare Stored Procedure.
+- Riscrivere e ottimizzare query lente.
+- Evitare grandi operazioni batch.
+
+---
+
+SE NON SUFFICIENTE:
+- Valutare UPGRADE a SQL Server Standard Edition per eliminare limiti e sfruttare pienamente hardware disponibile.
+
